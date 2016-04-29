@@ -27,6 +27,7 @@ def sendData():
         UNOtmp = ser2.readline()
         UNOhum = ser2.readline()
         
+    params = urllib.urlencode({'field1':tmp,'field2':hum,'field3':light,'field4':rain,'field5':airdust,'field6':UNOtmp,'field7':UNOhum,key':key})
     headers = {"Content-typZZe": "application/x-www-form-urlencoded","Accept": "text/plain"}
     conn = httplib.HTTPConnection("api.thingspeak.com:80")
     try:
