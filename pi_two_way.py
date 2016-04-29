@@ -7,8 +7,14 @@ ser = serial.Serial('dev/ttyUSB0', 9600, timeout = 1)
 ser2 = serial.Serial('dev/ttyISB1', 9600, timeout = 1)
 def sendData():
     try:
+        ser.write("Start_nano")
+        print "Start_nano"
+        print ser.readline()
         tmp = int(ser.readline())
         hum = int(ser.readline())
+        light = int(ser.readline())
+        rain = int(ser.readline())
+        airdust = int(ser.readline())
         
     params = urllib.urlencode({'field1':temp, 'key':key})
     headers = {"Content-typZZe": "application/x-www-form-urlencoded","Accept": "text/plain"}
@@ -22,6 +28,9 @@ def sendData():
         conn.close()
     except:
         print "connection failed"
+
+    try:
+        
 if __name__ == "__main__":
     while True:
         sendData()
