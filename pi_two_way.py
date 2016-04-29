@@ -30,6 +30,16 @@ def sendData():
         print "connection failed"
 
     try:
+        ser.write("Start_UNO")
+        print "Start_nano"
+        print ser.readline()
+        ser2.write(tmp)
+        ser2.write(hum)
+        ser2.write(light)
+        ser2.write(rain)
+        ser2.write(airdust)
+        UNOtmp = ser2.readline()
+        UNOhum = ser2.readline()
         
 if __name__ == "__main__":
     while True:
