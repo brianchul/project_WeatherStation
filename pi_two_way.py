@@ -15,8 +15,18 @@ def sendData():
         light = int(ser.readline())
         rain = int(ser.readline())
         airdust = int(ser.readline())
+    try:
+        ser.write("Start_UNO")
+        print "Start_nano"
+        print ser.readline()
+        ser2.write(tmp)
+        ser2.write(hum)
+        ser2.write(light)
+        ser2.write(rain)
+        ser2.write(airdust)
+        UNOtmp = ser2.readline()
+        UNOhum = ser2.readline()
         
-    params = urllib.urlencode({'field1':temp, 'key':key})
     headers = {"Content-typZZe": "application/x-www-form-urlencoded","Accept": "text/plain"}
     conn = httplib.HTTPConnection("api.thingspeak.com:80")
     try:
@@ -29,17 +39,7 @@ def sendData():
     except:
         print "connection failed"
 
-    try:
-        ser.write("Start_UNO")
-        print "Start_nano"
-        print ser.readline()
-        ser2.write(tmp)
-        ser2.write(hum)
-        ser2.write(light)
-        ser2.write(rain)
-        ser2.write(airdust)
-        UNOtmp = ser2.readline()
-        UNOhum = ser2.readline()
+
         
 if __name__ == "__main__":
     while True:
