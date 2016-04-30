@@ -19,48 +19,60 @@ float calcVoltage = 0;
 float dustDensity = 0;
 float UVlight = 0;
 unsigned int adc_value = 0;
+String getWord = " ";
 
-void setup(){
-        Serial.begin(9600);
+void setup() {
+  Serial.begin(9600);
 }
 
-void loop(){
-        if(dht.readTemperature() >= 0
-           && dht.readTemperature() <= 40
-           && dht.readHumidity() >= 0
-           && dht.readHumidity() <= 100) {
-                if (Serial.read() == "Start_nano") {
-                        Serial.println("OK");
-                        Serial.println(dht.readTemperature());
-                        Serial.println(dht.readHumidity());
-                        Serial.println(lightmeter.readLightLevel());
-                        Serial.println(digialRead(RAINda));
-                        Serial.println(airdust());
-                        Serial.println(adcAverage());
-                }
+void loop() {
+  if (dht.readTemperature() >= 0
+      && dht.readTemperature() <= 40
+      && dht.readHumidity() >= 0
+      && dht.readHumidity() <= 100) {
+    if (Serial.available() > 0)
+    {
+      char Serial_Buffer = Serial.read();
+      if (Serial_Buffer != '\n') {
+        getWord += Serial_Buffer;
+      }
+      else
+      {
+        if (getWord == "Start_nano") {
+          Serial.println("OK");
+          Serial.println(dht.readTemperature());
+          Serial.println(dht.readHumidity());
+          Serial.println(lightmeter.readLightLevel());
+          Serial.println(digialRead(RAINda));
+          Serial.println(airdust());
+          Serial.println(adcAverage());
         }
-        delay(1000);
+        getWord = "";
+      }
+    }
+  }
+  delay(1000);
 }
 
-float airdust(){
-        digitalWrite(PMLGT, LOW);
-        delayMicroseconds(280);
-        float voMeasure = analogRead(PMan);
-        delayMicroseconds(40);
-        digitalWrite(PMLGT, HIGH);
-        return voMeasure;
+float airdust() {
+  digitalWrite(PMLGT, LOW);
+  delayMicroseconds(280);
+  float voMeasure = analogRead(PMan);
+  delayMicroseconds(40);
+  digitalWrite(PMLGT, HIGH);
+  return voMeasure;
 }
 
 unsigned int adcAverage()
 {
-        unsigned char samples = 64;
-        unsigned long avg = 0;
-        while (samples > 0)
-        {
-                avg = (avg + analogRead(UV));
-                delayMicroseconds(4);
-                samples--;
-        }
-        avg >>= 6;
-        return avg;
+  unsigned char samples = 64;
+  unsigned long avg = 0;
+  while (samples > 0)
+  {
+    avg = (avg + analogRead(UV));
+    delayMicroseconds(4);
+    samples--;
+  }
+  avg >>= 6;
+  return avg;
 }
