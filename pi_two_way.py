@@ -1,13 +1,14 @@
 import urllib
 import httplib
 import serial
+import time
 
 key = '50K4ERTOTXTA8GX4'
 ser = serial.Serial('dev/ttyUSB0', 9600, timeout = 1)
-ser2 = serial.Serial('dev/ttyISB1', 9600, timeout = 1)
+ser2 = serial.Serial('dev/ttyUSB1', 9600, timeout = 1)
 def sendData():
     try:
-        ser.write("Start_nano")
+        ser.write("Start_nano\r\n")
         print "Start_nano"
         print ser.readline()
         tmp = int(ser.readline())
@@ -16,7 +17,7 @@ def sendData():
         rain = int(ser.readline())
         airdust = int(ser.readline())
     try:
-        ser.write("Start_UNO")
+        ser.write("Start_UNO\r\n")
         print "Start_nano"
         print ser.readline()
         ser2.write(tmp)
@@ -45,3 +46,4 @@ def sendData():
 if __name__ == "__main__":
     while True:
         sendData()
+        time.sleep(15)
