@@ -17,6 +17,7 @@ void setup() {
   Serial.begin(9600);
   lcd.begin(20,4);
 //  lcd.blacklight();
+  lcd.home();
   lcdloc();
 }
 
@@ -49,8 +50,14 @@ void loop() {
       }
       else if(getWord == "Adj_time"){
         Serial.println("OK");
-        myRTC.setDS1302Time(Serial.read(), Serial.read(), Serial.read(), Serial.read(), Serial.read(), Serial.read(), Serial.read());
-      }
+        int seconds = Serial.read();
+        int minutes = Serial.read();
+        int hours = Serial.read();
+        int dayofweek = Serial.read();
+        int dayofmonth = Serial.read();
+        int months = Serial.read();
+        int years = Serial.read();
+        myRTC.setDS1302Time(seconds, minutes, hours, dayofweek, dayofmonth, months, years);
     }
   }
 
