@@ -63,13 +63,13 @@ def sendTime():
     try:
         ser2.write('Adj_time')
         print 'Adj_time'
-        ser2.write(time.strftime("%S"))
-        ser2.write(time.strftime("%M"))
-        ser2.write(time.strftime("%H"))
-        ser2.write(time.strftime("%w"))
-        ser2.write(time.strftime("%d"))
-        ser2.write(time.strftime("%m"))
-        ser2.write(time.strftime("%Y"))
+        ser2.write(time.strftime("%S"))       #second
+        ser2.write(time.strftime("%M"))      #minutes
+        ser2.write(time.strftime("%H"))      #hour
+        ser2.write(time.strftime("%w"))      #day of week
+        ser2.write(time.strftime("%d"))      #day
+        ser2.write(time.strftime("%m"))     #month
+        ser2.write(time.strftime("%Y"))      #year
     except:
 
         # seconds, minutes, hours, day of the week, day of the month, month, year
