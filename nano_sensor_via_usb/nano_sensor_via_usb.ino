@@ -1,10 +1,9 @@
-
-
 #include <DHT.h>
 #include <BH1750.h>
+#include <Wire.h>
 
 #define DHT_PIN 10
-#define DHTTYPE DHT11
+#define DHTTYPE DHT22
 #define RAINan 7
 #define RAINda 5
 #define PMan 0
@@ -20,31 +19,40 @@ float dustDensity = 0;
 float UVlight = 0;
 unsigned int adc_value = 0;
 String getWord = "";
+float airdusts;
+float adcs;
+long timer;
+
 
 void setup() {
   Serial.begin(9600);
+  timer = millis();
+  lightMeter.begin();
+  pinMode(RAINda, INPUT);
 }
 
 void loop() {
+  if (millis() - timer >= 5000) {
+    adcs = adcAverage();
+    airdusts = airdust();
+    timer = millis();
+  }
   if (Serial.available() > 0)
   {
-    digitalWrite(13, HIGH);
     char Serial_Buffer = Serial.read();
     if (Serial_Buffer != '\n') {
       getWord += Serial_Buffer;
-      // Serial.println(getWord);
     }
     else
     {
+
       if (getWord == "Start_nano\r") {
-        digitalWrite(13, LOW);
-        Serial.println("OK");
         Serial.println(dht.readTemperature());
         Serial.println(dht.readHumidity());
         Serial.println(lightMeter.readLightLevel());
-        Serial.println(digitalRead(RAINda));
-        Serial.println(airdust());
-        Serial.println(adcAverage());
+        Serial.println(rainDa());
+        Serial.println(airdusts);
+        Serial.println(adcs);
       }
       getWord = "";
     }
@@ -73,5 +81,11 @@ unsigned int adcAverage()
   }
   avg >>= 6;
   return avg;
+}
+bool rainDa() {
+  if (digitalRead(RAINda) == 0)
+    return 1;
+  else return 0;
+
 }
 
