@@ -18,7 +18,7 @@ float calcVoltage = 0;
 float dustDensity = 0;
 float UVlight = 0;
 unsigned int adc_value = 0;
-String getWord = "";
+String getWord;
 float airdusts;
 float adcs;
 long timer;
@@ -40,21 +40,27 @@ void loop() {
   if (Serial.available() > 0)
   {
     char Serial_Buffer = Serial.read();
-    if (Serial_Buffer != '\n') {
-      getWord += Serial_Buffer;
-    }
-    else
-    {
-
-      if (getWord == "Start_nano\r") {
-        Serial.println(dht.readTemperature());
-        Serial.println(dht.readHumidity());
-        Serial.println(lightMeter.readLightLevel());
-        Serial.println(rainDa());
-        Serial.println(airdusts);
-        Serial.println(adcs);
+    if (Serial_Buffer != '\r' && Serial_Buffer != '\n') {
+      switch (Serial_Buffer) {
+        case 'T':
+          Serial.println(dht.readTemperature());
+          break;
+        case 'H':
+          Serial.println(dht.readHumidity());
+          break;
+        case 'L':
+          Serial.println(lightMeter.readLightLevel());
+          break;
+        case 'R':
+          Serial.println(rainDa());
+          break;
+        case 'A':
+          Serial.println(airdusts);
+          break;
+        case 'U':
+          Serial.println(adcs);
+          break;
       }
-      getWord = "";
     }
   }
 

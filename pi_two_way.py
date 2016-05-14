@@ -18,28 +18,53 @@ adc = 0.0
 #/dev/ttyUSB0
 #/dev/ttyUSB1
 def sendData():
+    global tmp,hum,light,rain,airdust,UNOtmp,UNOhum,adc
     try:
-        ser.write('Start_nano\r\n')
-        print 'Start_nano'
-        #print ser.readline()
-        global tmp,hum,light,rain,airdust,UNOtmp,UNOhum,adc
+        ser.write('T\r\n')
         tmp = float(ser.readline())
-        hum = float(ser.readline())
-        light = int(ser.readline())
-        rain = int(ser.readline())
-        airdust = int(ser.readline())
-        adc = float(ser.readline())
+        print 'Temperature: ' + str(tmp) + ' C'
     except:
-        print 'ERROR serial1'
+        print 'ERROR GET Temperature value'
+        
+    try:
+        ser.write('H\r\n')
+        hum = float(ser.readline())
+        print 'Humidity:    ' + str(hum) + ' %'
+    except:
+        print 'ERROR GET Humidity value'
+        
+    try:
+        ser.write('L\r\n')
+        light = int(ser.readline())
+        print 'Light:       ' + str(light) + ' lux'
+    except:
+        print 'ERROR GET Light value'
+        
+    try:
+        ser.write('R\r\n')
+        rain = int(ser.readline())
+        print 'Check if is rainng: ' + str(bool(rain))
+    except:
+        print 'ERROR GET Rain state'
+        
+    try:
+        ser.write('A\r\n')
+        airdust = int(ser.readline())
+        calcVoltage = airdust * (5.0 / 1024)
+        dustDensity = (0.17 * calcVoltage - 0.1)*1000
+        print 'Airdust value: ' + str(dustDensity)
+    except:
+        print 'ERROR GET Airdust value'
+        
+    try:
+        ser.write('U\r\n')
+        adc = float(ser.readline())
+        print 'adc value:   ' + str(adc)
+    except:
+        print 'ERROR GET Airdust value'
+   
     
-    print 'Temperature: ' + str(tmp) + ' C'
-    print 'Humidity:    ' + str(hum) + ' %'
-    print 'Light:       ' + str(light) + ' lux'
-    print 'Check if is rainng: ' + str(bool(rain))
-    calcVoltage = airdust * (5.0 / 1024)
-    dustDensity = (0.17 * calcVoltage - 0.1)*1000
-    print 'Airdust value: ' + str(dustDensity)
-    print 'adc value:   ' + str(adc)
+    
 
     transmit((tmp*100)+10000)
     transmit((hum*100)+20000)
