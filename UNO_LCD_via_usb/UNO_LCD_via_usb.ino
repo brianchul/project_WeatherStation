@@ -54,8 +54,10 @@ void loop() {
     airdust = (tempnum - 50000);
   else if (tempnum >= 60000)
     adc_value = (tempnum - 60000);
-  // Serial.println(dht.readTemperature());
-  //  Serial.println(dht.readHumidity());
+  else if (tempnum == 999)
+    Serial.println(dht.readTemperature());
+  else if (tempnum == 899)
+    Serial.println(dht.readHumidity());
   //myRTC.setDS1302Time(10, 39, 8, 5, 15, 1, 2016);
   setCount = millis();
   showDataLCD();
@@ -169,31 +171,31 @@ void showDataLCD() {
 }
 
 void RTCtime() {
-  lcd.setCursor(0, 2);
+  lcd.setCursor(0, 3);
   lcd.print(myRTC.year);
-  lcd.setCursor(4, 2);
+  lcd.setCursor(4, 3);
   lcd.print("/");
 
   if (myRTC.month < 10) {
-    lcd.setCursor(5, 2);
+    lcd.setCursor(5, 3);
     lcd.print("0");
-    lcd.setCursor(6, 2);
+    lcd.setCursor(6, 3);
     lcd.print(myRTC.month);
   } else {
-    lcd.setCursor(5, 2);
+    lcd.setCursor(5, 3);
     lcd.print(myRTC.month);
   }
 
-  lcd.setCursor(7, 2);
+  lcd.setCursor(7, 3);
   lcd.print("/");
 
   if (myRTC.dayofmonth < 10) {
-    lcd.setCursor(8, 2);
+    lcd.setCursor(8, 3);
     lcd.print("0");
-    lcd.setCursor(9, 2);
+    lcd.setCursor(9, 3);
     lcd.print(myRTC.dayofmonth);
   } else {
-    lcd.setCursor(8, 2);
+    lcd.setCursor(8, 3);
     lcd.print(myRTC.dayofmonth);
   }
 
@@ -232,8 +234,8 @@ void RTCtime() {
     lcd.setCursor(17, 3);
     lcd.print(myRTC.seconds);
   }
-  lcd.setCursor(0, 3);
-  weeks();
+//  lcd.setCursor(0, 3);
+//  weeks();
 }
 
 char weeks() {

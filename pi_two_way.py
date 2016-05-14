@@ -4,9 +4,9 @@ import serial
 import time
 import os
 
-key = '50K4ERTOTXTA8GX4'
-ser = serial.Serial('/dev/ttyUSB1', 9600, timeout=1)
-ser2 = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+key = 'CR01TTKM5380SCYU'
+ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+ser2 = serial.Serial('/dev/ttyUSB1', 9600, timeout=1)
 tmp = 0.0
 hum = 0.0
 light = 0
@@ -49,12 +49,13 @@ def sendData():
         
     try:
         ser.write('A\r\n')
-        airdust = int(ser.readline())
-        calcVoltage = airdust * (5.0 / 1024)
-        dustDensity = (0.17 * calcVoltage - 0.1)*1000
-        print 'Airdust value: ' + str(dustDensity)
+        airdust = long(ser.readline())
     except:
         print 'ERROR GET Airdust value'
+        
+    calcVoltage = airdust * (5.0 / 1024)
+    dustDensity = (0.17 * calcVoltage - 0.1)*1000
+    print 'Airdust value: ' + str(dustDensity)
         
     try:
         ser.write('U\r\n')
@@ -62,16 +63,21 @@ def sendData():
         print 'adc value:   ' + str(adc)
     except:
         print 'ERROR GET Airdust value'
-   
-    
-    
 
-    transmit((tmp*100)+10000)
-    transmit((hum*100)+20000)
+    transmit(str(999))
+    UNOtmp = float(ser2.readline())
+    transmit(str(899))
+    UNOhum = float(ser2.readline())
+
+    transmit(str((tmp*100)+10000))
+    transmit(str((hum*100)+20000))
     transmit(str(light+30000))
     transmit(str(rain+40000))
     transmit(str(airdust+50000))
-
+    
+    print 'Local Temperature: ' + str(UNOtmp) + ' C'
+    print 'Local Humidity:    ' + str(UNOhum) + ' %'
+    
     params = urllib.urlencode({
         'field1': tmp,
         'field2': hum,
@@ -82,13 +88,13 @@ def sendData():
         'field7': UNOhum,
         'key': key,
         })
-    headers = {'Content-typZZe': 'application/x-www-form-urlencoded',
+    headers = {'Content-type': 'application/x-www-form-urlencoded',
                'Accept': 'text/plain'}
     conn = httplib.HTTPConnection('api.thingspeak.com:80')
     try:
         conn.request('POST', '/update', params, headers)
         response = conn.getresponse()
-        print 'Thingspeak connection start'
+        print 'Thingspeak connection status:'
         print response.status
         print response.reason
         data = response.read()
@@ -97,15 +103,16 @@ def sendData():
         print "connection to thingspeak failed"
         
     try:
-        httpServ = httplib.HTTPConnection("127.0.0.1", 80)
+        httpServ = httplib.HTTPConnection('127.0.0.1:80')
         httpServ.connect()
-        httpServ.request('GET', '/print.php?temp='+str(tmp)+'&hum='+str(hum)+'&light='+str(light)+'&rain='+str(rain)+'&airdust='+str(dustDensity)+'&UNOtmp='+str(UNOtmp)+'&UNOhum='+str(UNOhum)+'')
+        httpServ.request('GET', '/print.php?temp='+str(tmp)+'&hum='+str(hum)+'&light='+str(light)+'&rain='+str(rain)+'&airdust='+str(airdust)+'&UNOtmp='+str(UNOtmp)+'&UNOhum='+str(UNOhum))
         response = httpServ.getresponse()
-        print 'Local database connection start'
+        print 'Local database connection status:'
         print response.status
         print response.reason
-        if response.status == httplib.OK:
-            httpServ.close()
+        #if response.status == httplib.OK:
+        #    httpServ.close()
+        httpServ.close()
     except:
         print  "connection to local server failed"
 

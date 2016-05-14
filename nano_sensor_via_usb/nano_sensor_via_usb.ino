@@ -19,7 +19,7 @@ float dustDensity = 0;
 float UVlight = 0;
 unsigned int adc_value = 0;
 String getWord;
-float airdusts;
+int airdusts;
 float adcs;
 long timer;
 
@@ -66,7 +66,7 @@ void loop() {
 
 }
 
-float airdust() {
+int airdust() {
   digitalWrite(PMLGT, LOW);
   delayMicroseconds(280);
   float voMeasure = analogRead(PMan);
