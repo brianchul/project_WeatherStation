@@ -12,7 +12,8 @@ DHT dht(DHT_PIN, DHTTYPE);
 virtuabotixRTC myRTC(2, 3, 4);
 float temperature, humidity, UNOtemperature, UNOhumidity;
 int lightmeter, israin, airdust, adc_value;
-long setCount, tempnum;
+char keyword;
+String showNumber = "";
 
 void lcdloc();
 void showDataLCD();
@@ -24,7 +25,7 @@ void setup() {
   lcd.init();
   lcd.backlight();
   lcdloc();
-  setCount = millis();
+
   pinMode(8, INPUT);
 }
 /*
@@ -38,63 +39,88 @@ adc = 60000
 void loop() {
   if (digitalRead(8) == HIGH)lcd.backlight();
   else lcd.setBacklight(0);
-  //if (millis () - setCount >= 1000) {
-  tempnum = getData();
-  if (tempnum > 0)
-    Serial.println(tempnum);
-  if (tempnum >= 10000 && tempnum < 20000)
-    temperature = ((tempnum - 10000) / 100.0);
-  else if (tempnum >= 20000 && tempnum < 30000)
-    humidity = ((tempnum - 20000) / 100.0);
-  else if (tempnum >= 30000 && tempnum < 40000)
-    lightmeter = (tempnum - 30000);
-  else if (tempnum >= 40000 && tempnum < 50000)
-    israin = (tempnum - 40000);
-  else if (tempnum >= 50000 && tempnum < 60000)
-    airdust = (tempnum - 50000);
-  else if (tempnum >= 60000)
-    adc_value = (tempnum - 60000);
-  else if (tempnum == 999)
-    Serial.println(dht.readTemperature());
-  else if (tempnum == 899)
-    Serial.println(dht.readHumidity());
+
+  keyword = getData()[0];
+  switch (keyword) {
+    case 'T':
+      temperature = stringToLong(getData()) / 10.0;
+      break;
+    case 'H':
+      humidity = stringToLong(getData()) / 10.0;
+      break;
+    case 'L':
+      lightmeter = stringToLong(getData());
+      break;
+    case 'R':
+      israin = stringToLong(getData());
+      break;
+    case 'A':
+      airdust = stringToLong(getData());
+      break;
+    case 'U':
+      adc_value = stringToLong(getData());
+      break;
+    case 'Q':
+      Serial.println((long)(dht.readTemperature() * 10));
+      break;
+    case 'W':
+      Serial.println((long)(dht.readHumidity() * 10));
+      break;
+    case 'E':
+      int seconds = stringToLong(getData());
+      int minutes = stringToLong(getData());
+      int hours = stringToLong(getData());
+      int dayofweek = stringToLong(getData());
+      int dayofmonth = stringToLong(getData());
+      int months = stringToLong(getData());
+      int years = stringToLong(getData());
+      myRTC.setDS1302Time(seconds, minutes, hours, dayofweek, dayofmonth, months, years);
+      break;
+  }
   //myRTC.setDS1302Time(10, 39, 8, 5, 15, 1, 2016);
-  setCount = millis();
   showDataLCD();
   lcdloc();
-  // }
+
   /*else if (getWord == "Adj_time\r") {
     Serial.println("OK");
-    int seconds = Serial.read();
-    int minutes = Serial.read();
-    int hours = Serial.read();
-    int dayofweek = Serial.read();
-    int dayofmonth = Serial.read();
-    int months = Serial.read();
-    int years = Serial.read();
-    myRTC.setDS1302Time(seconds, minutes, hours, dayofweek, dayofmonth, months, years);
+
   }*/
 
   myRTC.updateTime();
   RTCtime();
 }
+long stringToLong(String s)
+{
+  char arr[12];
+  s.toCharArray(arr, sizeof(arr));
+  return atol(arr);
+}
 
-long getData(void)
+String getData(void)
 {
   char numberString[10];
   unsigned char index = 0;
+  String returnString = "";
   delay(10);
   while (Serial.available() > 0)
   {
+    char Serial_Buff = Serial.read();
+    if (Serial_Buff == '\r' || Serial_Buff == '\n')
+      break;
+    else
+      returnString += Serial_Buff;
+    /*
     delay(10);
     numberString[index++] = Serial.read();
     if (index > 10)
     {
       break;
     }
+    }
+
+    numberString[index] = 0;*/
   }
-  numberString[index] = 0;
-  return atol(numberString);
+  return returnString;
 }
 
 void lcdloc() {
@@ -128,10 +154,10 @@ void lcdloc() {
 void showDataLCD() {
   //temperature
   lcd.setCursor(4, 0);
-  lcd.print(temperature);
+  lcd.print(temperature, 1);
   //humidity
   lcd.setCursor(4, 1);
-  lcd.print(humidity);
+  lcd.print(humidity, 1);
   //還沒調整 rain
   lcd.setCursor(17, 0);
   if (israin == 1)
@@ -234,8 +260,8 @@ void RTCtime() {
     lcd.setCursor(17, 3);
     lcd.print(myRTC.seconds);
   }
-//  lcd.setCursor(0, 3);
-//  weeks();
+  //  lcd.setCursor(0, 3);
+  //  weeks();
 }
 
 char weeks() {

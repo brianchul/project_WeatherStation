@@ -20,7 +20,7 @@ float UVlight = 0;
 unsigned int adc_value = 0;
 String getWord;
 int airdusts;
-float adcs;
+int adcs;
 long timer;
 
 
@@ -32,9 +32,11 @@ void setup() {
 }
 
 void loop() {
-  if (millis() - timer >= 5000) {
-    adcs = adcAverage();
+  if (millis() - timer >= 3000) {
+    
     airdusts = airdust();
+    if (airdusts > 1023 && airdusts < 0)
+      airdusts = 1023;
     timer = millis();
   }
   if (Serial.available() > 0)
@@ -43,10 +45,10 @@ void loop() {
     if (Serial_Buffer != '\r' && Serial_Buffer != '\n') {
       switch (Serial_Buffer) {
         case 'T':
-          Serial.println(dht.readTemperature());
+          Serial.println((long)(dht.readTemperature()*10));
           break;
         case 'H':
-          Serial.println(dht.readHumidity());
+          Serial.println((long)(dht.readHumidity()*10));
           break;
         case 'L':
           Serial.println(lightMeter.readLightLevel());
@@ -58,7 +60,7 @@ void loop() {
           Serial.println(airdusts);
           break;
         case 'U':
-          Serial.println(adcs);
+          Serial.println(adcAverage());
           break;
       }
     }
